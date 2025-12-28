@@ -1,62 +1,44 @@
-# 导入自定义模块。如果不写：无法调用各个功能模块的代码。
+import torch
+from torchvision import transforms
+from torch.utils.data import DataLoader
+
+# 导入我们写好的模块
 from src.sabotage import generate_sabotaged_dataset
 from src.cleaning import clean_dataset
+from src.dataset import ChestXrayDataset
+from src.config import IMG_WIDTH, IMG_HEIGHT, BATCH_SIZE
 from src.visualization import plot_sample_images, plot_distribution
 
 def main():
-    """
-    Main execution flow for Phase 1: Data Preparation.
-    """
-    print("=== CA6000 Assignment: Chest X-Ray AI Diagnosis ===")  # 打印项目头。如果不写：仪式感缺失。
-    
-    # ---------------------------------------------------------
-    # 1. Data Acquisition & Fault Injection
-    # ---------------------------------------------------------
-    # 调用故障注入模块获取脏数据。如果不写：没有数据可以处理。
-    df_dirty = generate_sabotaged_dataset()
-    
-    # ---------------------------------------------------------
-    # 2. EDA (Before Cleaning)
-    # ---------------------------------------------------------
-    print("\n--- Visualizing Dirty Data ---")  # 打印阶段提示。如果不写：日志不清晰。
-    
-    # 绘制清洗前的分布图。如果不写：无法在报告中展示原始数据的混乱（含NaN）。
-    plot_distribution(df_dirty, 
-                      "Class Distribution (Raw with Errors)", 
-                      "01_distribution_dirty.png")
-    
-    # 筛选出被故意损坏的图片路径。如果不写：无法专门展示坏图样本。
-    bad_files = df_dirty[df_dirty['filepath'].str.contains('corrupt_')]
-    
-    # 如果找到了坏文件，就画出来。如果不写：当没生成坏文件时会报错。
-    if not bad_files.empty:
-        plot_sample_images(bad_files, 
-                           "Artificially Corrupted Samples", 
-                           "02_samples_corrupted.png")
+    # Phase 1: Sabotage
+    print("Phase 1: Generting Sabotaged Data")
+    dirty_df = generate_sabotaged_dataset()         # 生成包含 NaN、死链、黑白坏图、重复行的 DataFrame
+    print(f"Dirty Dataset Size: {len(dirty_df)}\n")
 
-    # ---------------------------------------------------------
-    # 3. Data Cleaning
-    # ---------------------------------------------------------
-    # 调用清洗模块执行双层清洗。如果不写：数据质量差，模型训练效果会很烂。
-    df_clean = clean_dataset(df_dirty)
-    
-    # ---------------------------------------------------------
-    # 4. Post-Cleaning Analysis
-    # ---------------------------------------------------------
-    print("\n--- Visualizing Cleaned Data ---")  # 打印阶段提示。如果不写：日志不清晰。
-    
-    # 绘制清洗后的分布图。如果不写：无法证明清洗工作有效（NaN消失）。
-    plot_distribution(df_clean, 
-                      "Class Distribution (Cleaned)", 
-                      "03_distribution_clean.png")
-    
-    # 展示清洗后的正常样本。如果不写：无法确认最终进入模型的是什么图。
-    plot_sample_images(df_clean, 
-                       "Cleaned Training Samples", 
-                       "04_samples_clean.png")
+    # Phase 2: Cleaning
+    print("Phase 2: Cleaning Data")
+    clean_df = clean_dataset(dirty_df)
+    print(f"\nClean Dataset Size: {len(clean_df)}\n")
 
-    print("\n=== Phase 1 Complete. Ready for Model Training. ===")  # 结束语。如果不写：不知道程序运行完了。
+    # Phase 3: Loading
+    print("Phase 3: Loading To Pytorch")
+    data_transforms = transforms.Compose([                  # 定义预处理：调整大小 -> 转张量。这里的 IMG_WIDTH, IMG_HEIGHT 来自 config.py (150)
+        transforms.Resize((IMG_WIDTH, IMG_HEIGHT)),
+        transforms.ToTensor(),
+    ])
+    dataset = ChestXrayDataset(clean_df, transform=data_transforms)      # 实例化 Dataset。注意：我们传进去的是 clean_df
+    
+    # 实例化 DataLoader
+    dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
 
-# 程序的入口判断。如果不写：被import时会意外执行main函数。
+    # 测试读取一个 Batch
+    try:
+        images, labels = next(iter(dataloader))
+        print(f"Success! Batch shape: {images.shape}") # 预期: [32, 3, 150, 150]
+        print(f"Labels shape: {labels.shape}")         # 预期: [32]
+        print("The pipeline is rock solid.")
+    except Exception as e:
+        print(f"Pipeline Failed! Error: {e}")
+
 if __name__ == "__main__":
     main()
