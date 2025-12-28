@@ -87,16 +87,6 @@ def main():
     # batch_size 参数传 BATCH_SIZE，来自 config
     dataset.preprocessed_data_describe(raw_total=len(dirty_df), batch_size=BATCH_SIZE)
 
-    dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
-
-    # 测试读取一个 Batch
-    try:
-        images, labels = next(iter(dataloader))
-        print(f"Success! Batch shape: {images.shape}")
-        print(f"Labels shape: {labels.shape}")
-        print("The pipeline is rock solid.")
-    except Exception as e:
-        print(f"Pipeline Failed! Error: {e}")
 
 if __name__ == "__main__":
     main()

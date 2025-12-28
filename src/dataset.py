@@ -1,5 +1,5 @@
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader
 from PIL import Image
 import numpy as np
 
@@ -89,8 +89,21 @@ class ChestXrayDataset(Dataset):
 
             if img_arr.min() == img_arr.max():          # 判断是否是纯黑或纯白图
                 suspicious_count += 1
-                
+
         if suspicious_count == 0:
             print("   [PASS] Sample check passed (No pure black/white images).")
         else:
             print(f"   [FAIL] Found {suspicious_count} suspicious images in sample!")
+
+        # --- 4. DataLoader Smoke Test (冒烟测试) ---
+        print(f"\n4. DataLoader Test (Batch Size={batch_size}):")
+        try:
+            test_loader = DataLoader(self, batch_size=batch_size, shuffle=True)    # 临时创建一个 loader 跑一次
+            images, labels = next(iter(test_loader))
+            print(f"   [SUCCESS] Batch loaded successfully.")
+            print(f"   Image Tensor Shape: {images.shape}")
+            print(f"   Label Tensor Shape: {labels.shape}")
+        except Exception as e:
+            print(f"   [CRITICAL FAIL] DataLoader Error: {e}")
+
+        print("="*40 + "\n")
