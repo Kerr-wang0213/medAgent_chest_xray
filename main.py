@@ -1,6 +1,4 @@
-import os
 from pathlib import Path  # 导入 Path 用于管理输出文件夹
-import torch
 from torchvision import transforms
 from torch.utils.data import DataLoader
 
@@ -8,7 +6,7 @@ from torch.utils.data import DataLoader
 from src.sabotage import generate_sabotaged_dataset
 from src.cleaning import clean_dataset
 from src.dataset import ChestXrayDataset
-from src.config import IMG_WIDTH, IMG_HEIGHT, BATCH_SIZE
+from src.config import IMG_WIDTH, IMG_HEIGHT, BATCH_SIZE, NORM_MEAN, NORM_STD
 from src.visualization import plot_sample_images, plot_distribution
 
 def main():
@@ -75,15 +73,24 @@ def main():
     print(">> Saved clean visualizations to folder.\n")
 
     # ---------------------------------------------------------
-    # Phase 3: Loading (加载到 PyTorch)
+    # Phase 3: Loading To Pytorch (With Normalization)
     # ---------------------------------------------------------
     print("Phase 3: Loading To Pytorch")
     
+    # 定义预处理流水线
     data_transforms = transforms.Compose([
+        # 1. 统一尺寸
         transforms.Resize((IMG_WIDTH, IMG_HEIGHT)),
+        
+        # 2. 转为 Tensor (0-255 -> 0.0-1.0)
         transforms.ToTensor(),
+        
+        # 3. 归一化 (关键步骤！)
+        # 将数据分布拉动到以 0 为中心，标准差为 1 的正态分布形态
+        transforms.Normalize(mean=NORM_MEAN, std=NORM_STD)
     ])
     
+    # 实例化 Dataset
     dataset = ChestXrayDataset(clean_df, transform=data_transforms)
     dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
 
