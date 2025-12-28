@@ -52,21 +52,17 @@ def clean_dataset(df):
     # 这是应对之前 "Sabotage" 中制造的重复行。
     # drop_duplicates() 默认保留第一条。
     df_step1 = df.drop_duplicates().copy()
-    
     dup_count = initial_count - len(df_step1)
-    print(f"[Check 1] Duplicate rows removed: {dup_count}") # 如果不写：不知道删了多少重复项。
+    print(f"[Fix 1] Duplicate rows removed: {dup_count}")
     
     # --- Step 2: Handle NaN (处理缺失标签) ---
     nan_count = df_step1['label'].isnull().sum()
-    print(f"[Check 2] Missing labels detected: {nan_count}")
-    
-    # 删除标签为空的行。
-    # 如果不写：PyTorch 的 Loss Function 无法处理 NaN 标签，训练必报错。
     df_step2 = df_step1.dropna(subset=['label']).copy()
-    print(f"[Fix 2] Dropped rows with missing labels. Remaining: {len(df_step2)}")
+    print(f"[Fix 2] Missing-label rows removed: {nan_count}")
+    # print(f"[Fix 2] Dropped rows with missing labels. Remaining: {len(df_step2)}")
     
     # --- Step 3 & 4: Path Validation & Image Quality (路径与质量检查) ---
-    print("[Check 3 & 4] Scanning file paths and image quality...") 
+    # print("[Check 3 & 4] Scanning file paths and image quality...") 
     
     valid_mask = []
     broken_path_count = 0
@@ -92,8 +88,8 @@ def clean_dataset(df):
         if not is_good:
             bad_image_count += 1
             
-    print(f"[Check 3] Broken file paths detected: {broken_path_count}") # 如果不写：不知道有多少路径是错的。
-    print(f"[Check 4] Corrupted images (black/white) detected: {bad_image_count}") # 如果不写：不知道有多少图片是坏的。
+    print(f"[Fix 3] Broken-path files removed: {broken_path_count}")
+    print(f"[Fix 4] Corrupted images (black/white) removed: {bad_image_count}")
     
     # 应用掩码过滤数据。
     # 如果不写：坏数据依然保留，会导致模型学习到错误的特征。
@@ -103,7 +99,7 @@ def clean_dataset(df):
     # 如果不写：索引会断断续续（如 0, 1, 5, 8...），可能导致 Dataset __getitem__ 报错。
     df_final = df_final.reset_index(drop=True)
     
-    print(f"[Fix 3 & 4] Removed invalid files.")
+    # print(f"[Fix 3 & 4] Removed invalid files.")
     print(f"Cleaning Complete. Data reduced from {initial_count} to {len(df_final)}.") 
     
     return df_final

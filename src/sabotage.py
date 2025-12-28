@@ -9,10 +9,10 @@ from .config import RAW_DATA_DIR, PROCESSED_DATA_DIR, RANDOM_SEED
 def generate_sabotaged_dataset():
     """
     Generate a dataset with artificial errors (NaNs and corrupted images).
-    1. NaN Labels
-    2. Corrupted Images (White/Black)
+    1. Duplicate Rows
+    2. NaN Labels
     3. Broken File Paths
-    4. Duplicate Rows
+    4. Corrupted Images (White/Black)
     """
     print("[Sabotage] Indexing raw data...")
     
@@ -39,17 +39,26 @@ def generate_sabotaged_dataset():
     df = pd.DataFrame({'filepath': filepaths, 'label': labels})
 
     rng = np.random.RandomState(RANDOM_SEED)
-    # --- Part 1: Simulate Missing Labels (NaN) ---
+
+    # --- part 1: 模拟重复数据 (Duplicate Rows) ---
+    duplicates = df.sample(n=30, random_state=rng)
+    
+    # 将重复行拼接到原 DataFrame 底部。
+    # ignore_index=True 会重置索引，模拟“由于多次录入导致的重复记录”。
+    df = pd.concat([df, duplicates], axis=0, ignore_index=True)
+    print(f"[Sabotage] Added 30 duplicate rows. Final count: {len(df)}")
+
+    # --- Part 2: Simulate Missing Labels (NaN) ---
     nan_indices = rng.choice(df.index, 50, replace=False)
     df.loc[nan_indices, 'label'] = np.nan
     print(f"[Sabotage] Created 50 NaN labels.")
 
-    # --- Part 2: Broken Paths ---
+    # --- Part 3: Broken Paths ---
     broken_indices = rng.choice(df.index, 20, replace=False)
     df.loc[broken_indices, 'filepath'] = "broken/path/to/nowhere/error_image.jpg"
     print(f"[Sabotage] Created 20 broken file paths.")
 
-    # --- Part 3: Simulate Image Corruption --- 随机选择15个索引用于破坏
+    # --- Part 4: Simulate Image Corruption --- 随机选择15个索引用于破坏
     processed_dir = Path(PROCESSED_DATA_DIR)
     processed_dir.mkdir(parents=True, exist_ok=True)
 
@@ -96,14 +105,6 @@ def generate_sabotaged_dataset():
     # 循环生成全黑图片。如果不写：不会生成欠曝样本。
     for idx in tqdm(underexposed_indices, desc="Generating Black Images"):
         save_corrupt_image(idx, 'black')
-
-    # --- part 4: 模拟重复数据 (Duplicate Rows) ---
-    duplicates = df.sample(n=30, random_state=rng)
-    
-    # 将重复行拼接到原 DataFrame 底部。
-    # ignore_index=True 会重置索引，模拟“由于多次录入导致的重复记录”。
-    df = pd.concat([df, duplicates], axis=0, ignore_index=True)
-    print(f"[Sabotage] Added 30 duplicate rows. Final count: {len(df)}")
 
 
     return df    # 返回包含脏数据的DataFrame。如果不写：主程序拿不到处理后的数据表。
