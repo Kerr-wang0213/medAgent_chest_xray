@@ -1,3 +1,5 @@
+import os
+from pathlib import Path  # 导入 Path 用于管理输出文件夹
 import torch
 from torchvision import transforms
 from torch.utils.data import DataLoader
@@ -10,32 +12,86 @@ from src.config import IMG_WIDTH, IMG_HEIGHT, BATCH_SIZE
 from src.visualization import plot_sample_images, plot_distribution
 
 def main():
-    # Phase 1: Sabotage
-    print("Phase 1: Generting Sabotaged Data")
-    dirty_df = generate_sabotaged_dataset()         # 生成包含 NaN、死链、黑白坏图、重复行的 DataFrame
+    # ---------------------------------------------------------
+    # 0. Setup: 准备输出目录
+    # ---------------------------------------------------------
+    # 定义保存可视化图片的文件夹。如果不写：图片会散落在项目根目录，很乱。
+    VIS_DIR = Path("visualizations_output")
+    VIS_DIR.mkdir(parents=True, exist_ok=True) # 如果文件夹不存在就创建
+
+    # ---------------------------------------------------------
+    # Phase 1: Sabotage (生成脏数据)
+    # ---------------------------------------------------------
+    print("Phase 1: Generating Sabotaged Data")
+    dirty_df = generate_sabotaged_dataset()
     print(f"Dirty Dataset Size: {len(dirty_df)}\n")
 
-    # Phase 2: Cleaning
+    # === Visualization Step 1: 展示脏数据 ===
+    print(">> Visualizing Dirty Data...")
+    
+    # 1. 画脏数据的分布图 (可能包含不平衡)
+    plot_distribution(
+        dirty_df, 
+        title="Class Distribution (Dirty)", 
+        save_filename=VIS_DIR / "01_distribution_dirty.png"
+    )
+
+    # 2. 专门把我们要展示的“坏图”挑出来画一下
+    # 逻辑：文件名里包含 'corrupt_' 的就是我们在 sabotage 阶段生成的坏图
+    corrupted_samples = dirty_df[dirty_df['filepath'].str.contains('corrupt_', na=False)]
+    
+    # 只有当确实存在坏图时才画，防止报错
+    if not corrupted_samples.empty:
+        plot_sample_images(
+            corrupted_samples, 
+            title="Sabotaged Images (Simulated Errors)", 
+            save_filename=VIS_DIR / "02_samples_corrupted.png"
+        )
+    print(">> Saved dirty visualizations to folder.\n")
+
+    # ---------------------------------------------------------
+    # Phase 2: Cleaning (数据清洗)
+    # ---------------------------------------------------------
     print("Phase 2: Cleaning Data")
     clean_df = clean_dataset(dirty_df)
     print(f"\nClean Dataset Size: {len(clean_df)}\n")
 
-    # Phase 3: Loading
+    # === Visualization Step 2: 展示清洗后的数据 ===
+    print(">> Visualizing Clean Data...")
+
+    # 1. 画清洗后的分布图 (确认数据量变化)
+    plot_distribution(
+        clean_df, 
+        title="Class Distribution (Cleaned)", 
+        save_filename=VIS_DIR / "03_distribution_clean.png"
+    )
+
+    # 2. 随机画几张正常的图
+    plot_sample_images(
+        clean_df, 
+        title="Valid Training Samples", 
+        save_filename=VIS_DIR / "04_samples_clean.png"
+    )
+    print(">> Saved clean visualizations to folder.\n")
+
+    # ---------------------------------------------------------
+    # Phase 3: Loading (加载到 PyTorch)
+    # ---------------------------------------------------------
     print("Phase 3: Loading To Pytorch")
-    data_transforms = transforms.Compose([                  # 定义预处理：调整大小 -> 转张量。这里的 IMG_WIDTH, IMG_HEIGHT 来自 config.py (150)
+    
+    data_transforms = transforms.Compose([
         transforms.Resize((IMG_WIDTH, IMG_HEIGHT)),
         transforms.ToTensor(),
     ])
-    dataset = ChestXrayDataset(clean_df, transform=data_transforms)      # 实例化 Dataset。注意：我们传进去的是 clean_df
     
-    # 实例化 DataLoader
+    dataset = ChestXrayDataset(clean_df, transform=data_transforms)
     dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
 
     # 测试读取一个 Batch
     try:
         images, labels = next(iter(dataloader))
-        print(f"Success! Batch shape: {images.shape}") # 预期: [32, 3, 150, 150]
-        print(f"Labels shape: {labels.shape}")         # 预期: [32]
+        print(f"Success! Batch shape: {images.shape}")
+        print(f"Labels shape: {labels.shape}")
         print("The pipeline is rock solid.")
     except Exception as e:
         print(f"Pipeline Failed! Error: {e}")

@@ -1,89 +1,74 @@
-import matplotlib.pyplot as plt  # 导入Matplotlib绘图库。如果不写：无法生成图表。
-import seaborn as sns  # 导入Seaborn库。如果不写：无法生成美观的统计图。
-import cv2  # 导入OpenCV。如果不写：无法读取要展示的图片。
-import pandas as pd  # 导入Pandas。如果不写：无法处理数据标签。
-from .config import RESULTS_DIR  # 导入结果保存路径。如果不写：不知道图存哪儿。
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+from PIL import Image
+from pathlib import Path
 
-def plot_sample_images(df, title, filename, num_samples=5):
+def plot_distribution(df, title, save_filename):
     """
-    Plot random sample images and save to results folder.
+    绘制并保存类别分布图。
+    对应 main.py 中的 EDA 分布绘制。
     """
-    # 如果DataFrame为空则直接返回。如果不写：空数据会导致报错。
-    if df.empty: return
-
-    # 随机采样指定数量的图片。如果不写：展示全部图片会内存溢出或太乱。
-    samples = df.sample(min(len(df), num_samples), random_state=42)
+    plt.figure(figsize=(10, 6))
     
-    # 创建画布。如果不写：图表没有载体。
-    plt.figure(figsize=(15, 5))
+    # 使用 seaborn 绘制计数图
+    # x='dataset_split' 表示横轴是 train/val/test
+    # hue='label' 表示按颜色区分 NORMAL/PNEUMONIA
+    sns.countplot(x='dataset_split', hue='label', data=df, palette='viridis')
     
-    # 遍历采样数据。如果不写：无法画出每一张子图。
-    for i, (idx, row) in enumerate(samples.iterrows()):
-        # 创建子图位置。如果不写：所有图片会重叠在一起。
-        plt.subplot(1, num_samples, i+1)
-        
-        # 读取图片。如果不写：无法获取图像内容。
-        img = cv2.imread(row['filepath'])
-        
-        # 检查图片是否读取成功。如果不写：坏路径会导致报错。
-        if img is not None:
-            # 将BGR转为RGB颜色空间。如果不写：图片颜色会显示成奇怪的蓝色调（OpenCV默认BGR）。
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            plt.imshow(img)  # 显示图片。如果不写：画布上是空的。
-        else:
-            # 如果读不出来，显示文字提示。如果不写：用户不知道这里原本有图。
-            plt.text(0.5, 0.5, "Error", ha='center', color='red')
-            
-        # 处理标签显示（NaN处理）。如果不写：NaN标签可能会导致报错或显示难看。
-        label_text = str(row['label']) if pd.notna(row['label']) else "NaN"
-        
-        # 设置子图标题。如果不写：不知道这张图是什么类别。
-        plt.title(f"Label: {label_text}")
-        
-        # 关闭坐标轴。如果不写：会有丑陋的刻度线。
-        plt.axis('off')
-    
-    # 设置总标题。如果不写：图表缺乏整体描述。
-    plt.suptitle(title, fontsize=16)
-    
-    # 自动调整布局。如果不写：子图之间可能会重叠遮挡。
-    plt.tight_layout()
-    
-    # 保存图片到结果目录。如果不写：图表只能看一眼，无法放入报告。
-    plt.savefig(RESULTS_DIR / filename)
-    
-    # 关闭画布释放内存。如果不写：循环画图时内存会飙升。
-    plt.close()
-    
-    print(f"[Viz] Saved figure: {filename}")  # 打印日志。如果不写：不知道图片保存成功没。
-
-def plot_distribution(df, title, filename):
-    """
-    Plot class distribution bar chart.
-    """
-    # 创建画布。如果不写：无法画图。
-    plt.figure(figsize=(8, 6))
-    
-    # 统计类别数量，并把 NaN 填充为字符串以便显示。如果不写：NaN会被忽略，看不到缺失情况。
-    counts = df['label'].fillna('Missing (NaN)').value_counts()
-    
-    # 绘制柱状图。如果不写：无法直观展示分布。
-    sns.barplot(x=counts.index, y=counts.values, palette='viridis')
-    
-    # 设置标题。如果不写：不知道图表含义。
     plt.title(title)
-    
-    # 设置Y轴标签。如果不写：不知道Y轴数字代表什么。
+    plt.xlabel('Dataset Split')
     plt.ylabel('Count')
+    plt.legend(title='Diagnosis')
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
     
-    # 在柱子上方标注具体数值。如果不写：很难看出精确数量。
-    for i, v in enumerate(counts.values):
-        plt.text(i, v + 50, str(v), ha='center')
+    # 保存图片到 results 文件夹（或者当前目录）
+    plt.tight_layout()
+    plt.savefig(save_filename)
+    print(f"[Visualization] Saved distribution plot to {save_filename}")
+    plt.close() # 关闭画布释放内存
+
+def plot_sample_images(df, title, save_filename, num_samples=5):
+    """
+    随机抽取样本并拼图展示。
+    对应 main.py 中的 坏图展示 和 清洗后样本展示。
+    """
+    # 如果数据不足 num_samples，就取全部
+    n = min(len(df), num_samples)
+    if n == 0:
+        print("[Visualization] No samples to plot.")
+        return
+
+    sample_df = df.sample(n=n, random_state=42)
+    
+    fig, axes = plt.subplots(1, n, figsize=(15, 3))
+    if n == 1: axes = [axes] # 处理只有一张图的情况
+    
+    fig.suptitle(title, fontsize=16)
+    
+    for ax, (_, row) in zip(axes, sample_df.iterrows()):
+        img_path = row['filepath']
+        label = row['label']
         
-    # 保存图表。如果不写：图表无法持久化。
-    plt.savefig(RESULTS_DIR / filename)
-    
-    # 关闭画布。如果不写：占用内存。
+        try:
+            # 使用 PIL 读取
+            with Image.open(img_path) as img:
+                ax.imshow(img, cmap='gray')
+                
+            # 获取文件名显示在标题里，方便确认是哪张图
+            fname = Path(img_path).name
+            # 如果文件名太长，截断一下
+            display_name = (fname[:10] + '..') if len(fname) > 10 else fname
+            
+            ax.set_title(f"{label}\n{display_name}", fontsize=10)
+            ax.axis('off')
+            
+        except Exception as e:
+            ax.set_title("Error loading")
+            ax.axis('off')
+            print(f"Error plotting {img_path}: {e}")
+            
+    plt.tight_layout()
+    plt.savefig(save_filename)
+    print(f"[Visualization] Saved sample images to {save_filename}")
     plt.close()
-    
-    print(f"[Viz] Saved figure: {filename}")  # 打印日志。如果不写：缺乏反馈。
