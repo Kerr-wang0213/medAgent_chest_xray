@@ -1,4 +1,4 @@
-from pathlib import Path  # 导入Path对象用于路径操作。如果不写：无法使用面向对象的路径管理，需要回退到繁琐的os.path字符串拼接。
+from pathlib import Path
 
 # ==========================================
 # 1. Path Configuration
@@ -7,28 +7,20 @@ from pathlib import Path  # 导入Path对象用于路径操作。如果不写：
 # 获取当前文件的父目录的父目录，即项目根目录。如果不写：程序不知道项目在哪里，导致无法找到数据文件。
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# 定义数据总目录。如果不写：后续代码无法引用 data 文件夹。
 DATA_DIR = BASE_DIR / 'data'
 
-# 定义处理后的数据保存目录。如果不写：生成的坏数据和中间文件无处存放。
 PROCESSED_DATA_DIR = DATA_DIR / 'processed'
 
-# 定义结果图表保存目录。如果不写：可视化生成的图片无法保存。
 RESULTS_DIR = BASE_DIR / 'results'
 
-# 定义模型文件保存目录。如果不写：训练好的模型无法持久化保存。
 MODEL_SAVE_DIR = BASE_DIR / 'models'
 
-# 定义原始数据存放目录。如果不写：程序找不到 Kaggle 下载的数据源。
 RAW_DATA_DIR = DATA_DIR / 'raw' / 'chest_xray'
 
-# 定义训练集具体路径。如果不写：后续需要手动拼接路径，降低代码复用性。
 TRAIN_DIR = RAW_DATA_DIR / 'train'
 
-# 定义测试集具体路径。如果不写：同上，不方便引用测试集。
 TEST_DIR = RAW_DATA_DIR / 'test'
 
-# 定义验证集具体路径。如果不写：同上。
 VAL_DIR = RAW_DATA_DIR / 'val'
 
 # 自动创建处理数据文件夹（如果不存在）。如果不写：当程序试图写入文件时会报 FileNotFoundError。

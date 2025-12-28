@@ -1,7 +1,7 @@
 import os  # 导入系统接口。如果不写：无法使用 os.listdir 遍历文件。
 import cv2  # 导入OpenCV库。如果不写：无法读取和修改图像像素。
-import numpy as np  # 导入NumPy库。如果不写：无法进行矩阵运算和随机数生成。
-import pandas as pd  # 导入Pandas库。如果不写：无法创建和操作数据表格。
+import numpy as np
+import pandas as pd
 from tqdm import tqdm  # 导入进度条库。如果不写：处理大量图片时不知道进度，用户体验差。
 # 从配置文件导入常量。如果不写：路径和种子需要硬编码，难以维护。
 from .config import RAW_DATA_DIR, PROCESSED_DATA_DIR, RANDOM_SEED
@@ -10,10 +10,10 @@ def generate_sabotaged_dataset():
     """
     Generate a dataset with artificial errors (NaNs and corrupted images).
     """
-    print("[Sabotage] Indexing raw data...")  # 打印状态。如果不写：用户不知道程序卡住了还是在运行。
+    print("[Sabotage] Indexing raw data...")
     
    
-    splits = ['train', 'test', 'val']     # 定义数据集划分列表。如果不写：循环无法进行。
+    splits = ['train', 'test', 'val']
     filepaths = []  # 初始化用于存储路径的列表。如果不写：无法收集数据。
     labels = []   # 初始化用于存储标签的列表。如果不写：无法对应图片的类别。
 
