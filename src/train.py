@@ -27,7 +27,7 @@ def train_model(model, train_loader, val_loader):
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
     
     # 准备记录数据的字典
-    history = {'train_loss': [], 'epoch_train_acc': [], 'val_loss': [], 'val_acc': []}
+    history = {'train_loss': [], 'train_acc': [], 'val_loss': [], 'val_acc': []}
     best_acc = 0.0
     
     # 2. 开始 Epoch 循环
