@@ -36,9 +36,6 @@ MODEL_SAVE_DIR.mkdir(parents=True, exist_ok=True)
 # 2. Hyperparameters
 # ==========================================
 
-# 定义输入数据的形状元组。如果不写：构建神经网络第一层时缺少 input_shape 参数。
-INPUT_SHAPE = (IMG_WIDTH, IMG_HEIGHT, 3)
-
 # 定义随机种子。如果不写：每次运行的数据划分和破坏结果都不一样，无法复现实验。
 RANDOM_SEED = 42
 
@@ -47,6 +44,9 @@ IMG_WIDTH = 224
 
 # 定义图片输入高度。如果不写：同上。
 IMG_HEIGHT = 224
+
+# 定义输入数据的形状元组。如果不写：构建神经网络第一层时缺少 input_shape 参数。
+INPUT_SHAPE = (IMG_WIDTH, IMG_HEIGHT, 3)
 
 # 定义批次大小。如果不写：各模块间批次大小可能不一致，导致训练出错。
 BATCH_SIZE = 32

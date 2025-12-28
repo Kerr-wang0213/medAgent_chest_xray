@@ -12,3 +12,5 @@ tqdm==4.67.1
 tzdata==2025.3
 matplotlib
 seaborn
+torchvision
+torch

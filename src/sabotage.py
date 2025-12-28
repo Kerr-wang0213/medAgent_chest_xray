@@ -20,6 +20,7 @@ def generate_sabotaged_dataset():
     splits = ['train', 'test', 'val']
     filepaths = []  # 初始化用于存储路径的列表。如果不写：无法收集数据。
     labels = []   # 初始化用于存储标签的列表。如果不写：无法对应图片的类别。
+    dataset_splits = []   #用来记录这一行数据属于 train, test 还是 val
 
 
     for split in splits:     # 遍历每一个划分集合（训练/测试/验证）。如果不写：只能读取部分数据。
@@ -34,9 +35,10 @@ def generate_sabotaged_dataset():
                     if f_path.suffix.lower() in ['.jpeg', '.jpg', '.png']:
                         filepaths.append(str(f_path)) # 将对应的标签加入列表, Path对象转str存入列表，如果不写：丢失类别信息。
                         labels.append(label)  # 将对应的标签加入列表。如果不写：丢失类别信息。
+                        dataset_splits.append(split)    #记录当前循环是在哪个 split 里
 
 
-    df = pd.DataFrame({'filepath': filepaths, 'label': labels})
+    df = pd.DataFrame({'filepath': filepaths, 'label': labels, 'dataset_split': dataset_splits})
 
     rng = np.random.RandomState(RANDOM_SEED)
 

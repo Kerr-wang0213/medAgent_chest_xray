@@ -3,6 +3,7 @@ import seaborn as sns
 import numpy as np
 from PIL import Image
 from pathlib import Path
+from sklearn.metrics import confusion_matrix
 
 def plot_distribution(df, title, save_filename):
     """
@@ -71,4 +72,58 @@ def plot_sample_images(df, title, save_filename, num_samples=5):
     plt.tight_layout()
     plt.savefig(save_filename)
     print(f"[Visualization] Saved sample images to {save_filename}")
+    plt.close()
+
+
+def plot_training_history(history, save_filename):
+    """
+    绘制训练过程中的 Loss 和 Accuracy 曲线。
+    对应 train.py 结束后的绘图。
+    """
+    epochs = range(1, len(history['train_loss']) + 1)
+    
+    plt.figure(figsize=(12, 5))
+    
+    # 1. Loss 曲线
+    plt.subplot(1, 2, 1)
+    plt.plot(epochs, history['train_loss'], 'b-', label='Train Loss')
+    plt.plot(epochs, history['val_loss'], 'r--', label='Val Loss')
+    plt.title('Loss Curve')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.grid(True, linestyle='--', alpha=0.5)
+    
+    # 2. Accuracy 曲线
+    plt.subplot(1, 2, 2)
+    plt.plot(epochs, history['train_acc'], 'b-', label='Train Acc')
+    plt.plot(epochs, history['val_acc'], 'r--', label='Val Acc')
+    plt.title('Accuracy Curve')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy (%)')
+    plt.legend()
+    plt.grid(True, linestyle='--', alpha=0.5)
+    
+    plt.tight_layout()
+    plt.savefig(save_filename)
+    print(f"[Visualization] Training history plot saved to {save_filename}")
+    plt.close()
+
+def plot_confusion_matrix(true_labels, pred_labels, classes, save_filename):
+    """
+    绘制混淆矩阵热力图。
+    对应 test.py 结束后的绘图。
+    """
+    cm = confusion_matrix(true_labels, pred_labels)
+    
+    plt.figure(figsize=(6, 5))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
+                xticklabels=classes, yticklabels=classes)
+    plt.ylabel('True Label')
+    plt.xlabel('Predicted Label')
+    plt.title('Confusion Matrix')
+    
+    plt.tight_layout()
+    plt.savefig(save_filename)
+    print(f"[Visualization] Confusion Matrix saved to {save_filename}")
     plt.close()
