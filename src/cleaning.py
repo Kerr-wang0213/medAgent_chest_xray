@@ -33,17 +33,17 @@ def clean_dataset(df):
     """
     initial_count = len(df)
     
-    # --- 1: Handle Duplicates --
+    # 1: Handle Duplicates
     df_step1 = df.drop_duplicates().copy()
     dup_count = initial_count - len(df_step1)
     print(f"[CLEANING] Duplicate rows removed: {dup_count}")
     
-    # --- 2: Handle NaN  ---
+    # 2: Handle NaN
     nan_count = df_step1['label'].isnull().sum()
     df_step2 = df_step1.dropna(subset=['label']).copy()
     print(f"[CLEANING] Missing-label rows removed: {nan_count}")
     
-    # --- 3 & 4: Path Validation & Image Quality ---  
+    # 3 & 4: Path Validation & Image Quality
     valid_mask = []
     broken_path_count = 0
     bad_image_count = 0
