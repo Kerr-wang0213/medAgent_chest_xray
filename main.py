@@ -7,10 +7,11 @@ import torch
 from src.sabotage import generate_sabotaged_dataset
 from src.cleaning import clean_dataset
 from src.dataset import ChestXrayDataset
-from src.config import IMG_WIDTH, IMG_HEIGHT, BATCH_SIZE, NORM_MEAN, NORM_STD, RESULTS_DIR
+from src.config import IMG_WIDTH, IMG_HEIGHT, BATCH_SIZE, NORM_MEAN, NORM_STD, RESULTS_DIR, MODEL_SAVE_DIR
 from src.visualization import plot_sample_images, plot_distribution
 from src.model import ChestXRayResNet18
 from src.train import train_model
+from src.evaluate import evaluate_model
 
 def main():
     #  Setup: 准备输出目录
@@ -114,10 +115,26 @@ def main():
     trained_model = train_model(model, train_loader, val_loader)
 
     print("\n>> Training Complete. Back to Main.")
-    
-    # 如果你想在这里顺便把 test 也跑了，可以解开下面这行的注释，需要先导入 test_model
-    # from src.test import test_model
-    # test_model(trained_model, test_loader)
+
+    print("--- [Phase 5] Final Evaluation on Test Set ---")
+    best_model_path = MODEL_SAVE_DIR / "best_model.pth"
+    if best_model_path.exists():
+        print(f"Loading best model weights from: {best_model_path}")
+        
+        # 1. 实例化模型
+        final_model = ChestXRayResNet18(num_classes=2)
+        
+        # 2. 加载权重(使用 CPU 映射以防万一)
+        checkpoint = torch.load(best_model_path, map_location='cpu')
+        final_model.load_state_dict(checkpoint)
+        
+        # 3. 运行评估
+        evaluate_model(final_model, test_loader)
+        
+    else:
+        print("[Error] best_model.pth not found!")
+
+    print("\n=== Pipeline Complete ===")
 
 if __name__ == "__main__":
     main()

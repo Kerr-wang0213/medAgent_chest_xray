@@ -109,20 +109,30 @@ def plot_training_history(history, save_filename):
     print(f"[Visualization] Training history plot saved to {save_filename}")
     plt.close()
 
-def plot_confusion_matrix(true_labels, pred_labels, classes, save_filename):
+def plot_confusion_matrix(y_true, y_pred, class_names, save_filename):
     """
     绘制混淆矩阵热力图。
-    对应 test.py 结束后的绘图。
-    """
-    cm = confusion_matrix(true_labels, pred_labels)
+    对应 evaluate.py 结束后的绘图。
     
-    plt.figure(figsize=(6, 5))
+    Args:
+        y_true: 真实标签列表
+        y_pred: 预测标签列表
+        class_names: 类别名称列表 (如 ['NORMAL', 'PNEUMONIA'])
+        save_filename: 保存路径
+    """
+    # 1. 计算混淆矩阵
+    cm = confusion_matrix(y_true, y_pred)
+    
+    # 2. 绘图
+    plt.figure(figsize=(8, 6))
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
-                xticklabels=classes, yticklabels=classes)
+                xticklabels=class_names, yticklabels=class_names)
+    
+    plt.title('Confusion Matrix')
     plt.ylabel('True Label')
     plt.xlabel('Predicted Label')
-    plt.title('Confusion Matrix')
     
+    # 3. 保存
     plt.tight_layout()
     plt.savefig(save_filename)
     print(f"[Visualization] Confusion Matrix saved to {save_filename}")
