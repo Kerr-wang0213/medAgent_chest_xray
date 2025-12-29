@@ -18,14 +18,14 @@ def generate_sabotaged_dataset():
     
     processed_dir = Path(PROCESSED_DATA_DIR)
     if processed_dir.exists():
-        shutil.rmtree(processed_dir)   # 递归删除文件夹及其内容
+        shutil.rmtree(processed_dir)   # Delete folder and its contents
     
     processed_dir.mkdir(parents=True, exist_ok=True)
    
     splits = ['train', 'test', 'val']
-    filepaths = []  # 存储路径的列表
-    labels = []   # 存储标签的列表
-    dataset_splits = []   # 记录数据属于 train, test 还是 val
+    filepaths = []  # List storage paths
+    labels = []   # List storage labels
+    dataset_splits = []   # Record data belonging to: training set, test set, or validation set
 
 
     for split in splits:
@@ -46,23 +46,23 @@ def generate_sabotaged_dataset():
 
     rng = np.random.RandomState(RANDOM_SEED)
 
-    # --- 1: Duplicate Rows ---
+    # 1: Duplicate Rows
     duplicates = df.sample(n=30, random_state=rng)
     
     df = pd.concat([df, duplicates], axis=0, ignore_index=True)
     print(f"[SABOTAGED] Added 30 duplicate rows. Final count: {len(df)}")
 
-    # --- 2: Simulate Missing Labels (NaN) ---
+    # 2: Simulate Missing Labels (NaN)
     nan_indices = rng.choice(df.index, 50, replace=False)
     df.loc[nan_indices, 'label'] = np.nan
     print(f"[SABOTAGED] Created 50 NaN labels.")
 
-    # --- 3: Broken Paths ---
+    # 3: Broken Paths
     broken_indices = rng.choice(df.index, 20, replace=False)
     df.loc[broken_indices, 'filepath'] = "broken/path/to/nowhere/error_image.jpg"
     print(f"[SABOTAGED] Created 20 broken file paths.")
 
-    # --- 4: Simulate Image Corruption ---
+    # 4: Simulate Image Corruption
     processed_dir = Path(PROCESSED_DATA_DIR)
     processed_dir.mkdir(parents=True, exist_ok=True)
 

@@ -35,8 +35,7 @@ class ChestXrayDataset(Dataset):
         return image, torch.tensor(label, dtype=torch.long)     # Return image tensor and label tensor 
     
 
-
-    def preprocessed_data_describe(self, original_total=None, batch_size=32):   # 预处理后的数据描述报告，包括：留存率计算、类别分布统计、完整性检查
+    def preprocessed_data_describe(self, original_total=None, batch_size=32):
         """       
         Args:
             original_total (int, optional): Volume of dirty data
@@ -89,10 +88,10 @@ class ChestXrayDataset(Dataset):
             print(f"   ! Found {suspicious_count} suspicious images in sample!")
 
 
-        # 4. DataLoader Smoke Test
+        # 4. DataLoader Test
         print(f"4. DataLoader Test (Batch Size={batch_size}):")
         try:
-            test_loader = DataLoader(self, batch_size=batch_size, shuffle=True)    # 临时创建一个 loader 跑一次
+            test_loader = DataLoader(self, batch_size=batch_size, shuffle=True)
             images, labels = next(iter(test_loader))
             print(f"   Batch loaded successfully! Image: {images.shape}, Label: {labels.shape}.\n")
         except Exception as e:
