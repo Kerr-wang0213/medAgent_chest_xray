@@ -53,7 +53,7 @@ class ChestXrayDataset(Dataset):
 
             print(f"   Original Size: {original_total}")
             print(f"   Removed Rows : {diff}")
-            print(f"   Survival Rate: {survival_rate:.2f}%\n")
+            print(f"   Survival Rate: {survival_rate:.2f}%")
             if survival_rate < 80:
                 print("   [WARNING] High data loss detected! Check cleaning logic.")
         else:
