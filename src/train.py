@@ -66,7 +66,7 @@ def train_model(model, train_loader, val_loader):
         
 
         # Phase C: Log & Save
-        print(f"[TRAINING] Epoch {epoch+1}/{EPOCHS} | "
+        print(f"Epoch {epoch+1}/{EPOCHS} | "
               f"Train: {epoch_train_acc:.2f}% (accuracy), {epoch_train_loss:.4f} (loss) | "
               f"Val: {epoch_val_acc:.2f}% (accuracy), {epoch_val_loss:.4f} (loss)")
         

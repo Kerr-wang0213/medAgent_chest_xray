@@ -43,7 +43,6 @@ class ChestXrayDataset(Dataset):
             batch_size (int, optional): Batch Size for DataLoader Smoke Test
         """
         clean_total = len(self)
-        print("[PREPROCESSED DATA DESCRIBE]")
  
         # 1. Data Retention
         print(f"1. Data Volume:")
@@ -56,7 +55,7 @@ class ChestXrayDataset(Dataset):
             print(f"   Removed Rows : {diff}")
             print(f"   Survival Rate: {survival_rate:.2f}%\n")
             if survival_rate < 80:
-                print("   [WARNING] High data loss detected! Check cleaning logic.\n")
+                print("   [WARNING] High data loss detected! Check cleaning logic.")
         else:
             print("   (Raw total not provided, skipping retention rate)")
 
