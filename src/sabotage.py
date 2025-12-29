@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path # 确保导入了 Path，虽然下面可能通过 config 导入了对象，显式导入更安全
 from PIL import Image
 import numpy as np
@@ -16,6 +17,12 @@ def generate_sabotaged_dataset():
     """
     print("[Sabotage] Indexing raw data...")
     
+    processed_dir = Path(PROCESSED_DATA_DIR)
+    if processed_dir.exists():
+        shutil.rmtree(processed_dir)   # 递归删除文件夹及其内容
+    
+    # 重新创建空文件夹
+    processed_dir.mkdir(parents=True, exist_ok=True)
    
     splits = ['train', 'test', 'val']
     filepaths = []  # 初始化用于存储路径的列表。如果不写：无法收集数据。
