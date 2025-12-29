@@ -7,14 +7,12 @@ from sklearn.metrics import confusion_matrix
 
 def plot_distribution(df, title, save_filename):
     """
-    绘制并保存类别分布图。
-    对应 main.py 中的 EDA 分布绘制。
+    Draw a bar chart of the data distribution across dataset splits and labels.
     """
     plt.figure(figsize=(10, 6))
     
-    # 使用 seaborn 绘制计数图
-    # x='dataset_split' 表示横轴是 train/val/test
-    # hue='label' 表示按颜色区分 NORMAL/PNEUMONIA
+    # x='dataset_split' - train/val/test
+    # hue='label' - NORMAL/PNEUMONIA
     sns.countplot(x='dataset_split', hue='label', data=df, palette='viridis')
     
     plt.title(title)
@@ -23,27 +21,24 @@ def plot_distribution(df, title, save_filename):
     plt.legend(title='Diagnosis')
     plt.grid(axis='y', linestyle='--', alpha=0.7)
     
-    # 保存图片到 results 文件夹（或者当前目录）
     plt.tight_layout()
     plt.savefig(save_filename)
-    print(f"[Visualization] Saved distribution plot to {save_filename}")
-    plt.close() # 关闭画布释放内存
+    print(f"VISUALIZATION] Saved distribution plot to {save_filename}")
+    plt.close()
 
 def plot_sample_images(df, title, save_filename, num_samples=5):
     """
-    随机抽取样本并拼图展示。
-    对应 main.py 中的 坏图展示 和 清洗后样本展示。
+    Randomly select samples and display them in a jigsaw puzzle format.
     """
-    # 如果数据不足 num_samples，就取全部
     n = min(len(df), num_samples)
     if n == 0:
-        print("[Visualization] No samples to plot.")
+        print("[VISUALIZATION] No samples to plot.")
         return
 
     sample_df = df.sample(n=n, random_state=42)
     
     fig, axes = plt.subplots(1, n, figsize=(15, 3))
-    if n == 1: axes = [axes] # 处理只有一张图的情况
+    if n == 1: axes = [axes]
     
     fig.suptitle(title, fontsize=16)
     
@@ -52,13 +47,10 @@ def plot_sample_images(df, title, save_filename, num_samples=5):
         label = row['label']
         
         try:
-            # 使用 PIL 读取
             with Image.open(img_path) as img:
                 ax.imshow(img, cmap='gray')
-                
-            # 获取文件名显示在标题里，方便确认是哪张图
+
             fname = Path(img_path).name
-            # 如果文件名太长，截断一下
             display_name = (fname[:10] + '..') if len(fname) > 10 else fname
             
             ax.set_title(f"{label}\n{display_name}", fontsize=10)
@@ -71,20 +63,19 @@ def plot_sample_images(df, title, save_filename, num_samples=5):
             
     plt.tight_layout()
     plt.savefig(save_filename)
-    print(f"[Visualization] Saved sample images to {save_filename}")
+    print(f"[VISUALIZATION] Saved sample images to {save_filename}")
     plt.close()
 
 
 def plot_training_history(history, save_filename):
     """
-    绘制训练过程中的 Loss 和 Accuracy 曲线。
-    对应 train.py 结束后的绘图。
+    Plot the Loss and Accuracy curves during the training process
     """
     epochs = range(1, len(history['train_loss']) + 1)
     
     plt.figure(figsize=(12, 5))
     
-    # 1. Loss 曲线
+    # 1. Loss
     plt.subplot(1, 2, 1)
     plt.plot(epochs, history['train_loss'], 'b-', label='Train Loss')
     plt.plot(epochs, history['val_loss'], 'r--', label='Val Loss')
@@ -94,7 +85,7 @@ def plot_training_history(history, save_filename):
     plt.legend()
     plt.grid(True, linestyle='--', alpha=0.5)
     
-    # 2. Accuracy 曲线
+    # 2. Accuracy
     plt.subplot(1, 2, 2)
     plt.plot(epochs, history['train_acc'], 'b-', label='Train Acc')
     plt.plot(epochs, history['val_acc'], 'r--', label='Val Acc')
@@ -106,24 +97,15 @@ def plot_training_history(history, save_filename):
     
     plt.tight_layout()
     plt.savefig(save_filename)
-    print(f"[Visualization] Training history plot saved to {save_filename}")
+    print(f"[VISUALIZATION] Training history plot saved to {save_filename}")
     plt.close()
 
 def plot_confusion_matrix(y_true, y_pred, class_names, save_filename):
     """
-    绘制混淆矩阵热力图。
-    对应 evaluate.py 结束后的绘图。
-    
-    Args:
-        y_true: 真实标签列表
-        y_pred: 预测标签列表
-        class_names: 类别名称列表 (如 ['NORMAL', 'PNEUMONIA'])
-        save_filename: 保存路径
+    Draw a confusion matrix heat map
     """
-    # 1. 计算混淆矩阵
     cm = confusion_matrix(y_true, y_pred)
     
-    # 2. 绘图
     plt.figure(figsize=(8, 6))
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
                 xticklabels=class_names, yticklabels=class_names)
@@ -132,8 +114,7 @@ def plot_confusion_matrix(y_true, y_pred, class_names, save_filename):
     plt.ylabel('True Label')
     plt.xlabel('Predicted Label')
     
-    # 3. 保存
     plt.tight_layout()
     plt.savefig(save_filename)
-    print(f"[Visualization] Confusion Matrix saved to {save_filename}")
+    print(f"[VISUALIZATION] Confusion Matrix saved to {save_filename}")
     plt.close()

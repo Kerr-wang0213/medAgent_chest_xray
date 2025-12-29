@@ -4,7 +4,9 @@ from .config import RESULTS_DIR
 from .visualization import plot_confusion_matrix
 
 def evaluate_model(model, test_loader):
-    
+    """
+    Evaluate the trained model on the test dataset and print a detailed report.
+    """
     model.eval()
     
     all_preds = []
@@ -18,12 +20,7 @@ def evaluate_model(model, test_loader):
             all_preds.extend(preds.numpy())
             all_labels.extend(labels.numpy())
             
-    # --- 报告生成 ---
     class_names = ['NORMAL', 'PNEUMONIA']
-    
-    print("\n" + "="*50)
-    print("FINAL TEST REPORT")
-    print("="*50)
     
     acc = accuracy_score(all_labels, all_preds)
     print(f"Overall Accuracy: {acc*100:.2f}%\n")
