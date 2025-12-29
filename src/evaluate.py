@@ -32,5 +32,4 @@ def evaluate_model(model, test_loader):
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     
     plot_confusion_matrix(all_labels, all_preds, class_names, save_path)
-    
-    print("="*50 + "\n")
+    print("Saved confusion matrix to folder.\n")

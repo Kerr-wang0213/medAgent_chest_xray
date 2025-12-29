@@ -31,18 +31,17 @@ def clean_dataset(df):
     Execute full cleaning pipeline: 
     Duplicates -> NaN -> Broken Paths -> Pixel Scan.
     """
-    print("\n[CLEANING] Starting cleaning pipeline...")
     initial_count = len(df)
     
     # --- 1: Handle Duplicates --
     df_step1 = df.drop_duplicates().copy()
     dup_count = initial_count - len(df_step1)
-    print(f"[Fix 1] Duplicate rows removed: {dup_count}")
+    print(f"[CLEANING] Duplicate rows removed: {dup_count}")
     
     # --- 2: Handle NaN  ---
     nan_count = df_step1['label'].isnull().sum()
     df_step2 = df_step1.dropna(subset=['label']).copy()
-    print(f"[Fix 2] Missing-label rows removed: {nan_count}")
+    print(f"[CLEANING] Missing-label rows removed: {nan_count}")
     
     # --- 3 & 4: Path Validation & Image Quality ---  
     valid_mask = []
@@ -66,8 +65,8 @@ def clean_dataset(df):
         if not is_good:
             bad_image_count += 1
             
-    print(f"[Fix 3] Broken-path files removed: {broken_path_count}")
-    print(f"[Fix 4] Corrupted images (black/white) removed: {bad_image_count}")
+    print(f"[CLEANING] Broken-path files removed: {broken_path_count}")
+    print(f"[CLEANING] Corrupted images (black/white) removed: {bad_image_count}")
     
     df_final = df_step2[valid_mask].copy()
     

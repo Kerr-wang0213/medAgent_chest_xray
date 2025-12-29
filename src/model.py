@@ -5,7 +5,7 @@ class ChestXRayResNet18(nn.Module):
     def __init__(self, num_classes=2, freeze_backbone=False):
         super(ChestXRayResNet18, self).__init__()
         
-        print(f"[MODEL] Initializing ResNet-18 (freeze_backbone={freeze_backbone})...")
+        print(f"[MODEL] Initialize ResNet-18 (freeze_backbone={freeze_backbone})")
         self.model = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
       
         if freeze_backbone:

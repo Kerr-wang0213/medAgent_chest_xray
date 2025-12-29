@@ -70,7 +70,7 @@ def generate_sabotaged_dataset():
     overexposed_indices = corruption_indices[:10]
     underexposed_indices = corruption_indices[10:]
 
-    print(f"[SABOTAGED] Generating corrupted images in {PROCESSED_DATA_DIR}...")
+    print(f"[SABOTAGED] Generating corrupted images in {PROCESSED_DATA_DIR}:")
 
 
     def save_corrupt_image(idx, mode):

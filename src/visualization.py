@@ -23,8 +23,9 @@ def plot_distribution(df, title, save_filename):
     
     plt.tight_layout()
     plt.savefig(save_filename)
-    print(f"VISUALIZATION] Saved distribution plot to {save_filename}")
+    print(f"[VISUALIZATION] Saved distribution plot to {save_filename}")
     plt.close()
+
 
 def plot_sample_images(df, title, save_filename, num_samples=5):
     """
@@ -99,6 +100,7 @@ def plot_training_history(history, save_filename):
     plt.savefig(save_filename)
     print(f"[VISUALIZATION] Training history plot saved to {save_filename}")
     plt.close()
+
 
 def plot_confusion_matrix(y_true, y_pred, class_names, save_filename):
     """
