@@ -9,11 +9,11 @@ def plot_distribution(df, title, save_filename):
     """
     Draw a bar chart of the data distribution across dataset splits and labels.
     """
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(6, 6))
     
     # x='dataset_split' - train/val/test
     # hue='label' - NORMAL/PNEUMONIA
-    sns.countplot(x='dataset_split', hue='label', data=df, palette='viridis')
+    sns.countplot(x='dataset_split', hue='label', data=df, palette='YlGnBu')
     
     plt.title(title)
     plt.xlabel('Dataset Split')
@@ -78,8 +78,8 @@ def plot_training_history(history, save_filename):
     
     # 1. Loss
     plt.subplot(1, 2, 1)
-    plt.plot(epochs, history['train_loss'], 'b-', label='Train Loss')
-    plt.plot(epochs, history['val_loss'], 'r--', label='Val Loss')
+    plt.plot(epochs, history['train_loss'], color='darkblue', linestyle='-', label='Train Loss')
+    plt.plot(epochs, history['val_loss'], color='mediumaquamarine', linestyle='--', label='Val Loss')
     plt.title('Loss Curve')
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
@@ -89,7 +89,7 @@ def plot_training_history(history, save_filename):
     # 2. Accuracy
     plt.subplot(1, 2, 2)
     plt.plot(epochs, history['train_acc'], 'b-', label='Train Acc')
-    plt.plot(epochs, history['val_acc'], 'r--', label='Val Acc')
+    plt.plot(epochs, history['val_acc'], 'green--', label='Val Acc')
     plt.title('Accuracy Curve')
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy (%)')
@@ -108,8 +108,8 @@ def plot_confusion_matrix(y_true, y_pred, class_names, save_filename):
     """
     cm = confusion_matrix(y_true, y_pred)
     
-    plt.figure(figsize=(8, 6))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
+    plt.figure(figsize=(10, 6))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='YlGnBu', 
                 xticklabels=class_names, yticklabels=class_names)
     
     plt.title('Confusion Matrix')
