@@ -53,7 +53,6 @@ def train_model(model, train_loader, val_loader):
 
         epoch_train_loss = train_loss / len(train_loader)
         epoch_train_acc = 100.0 * train_correct / total
-        print(f'Epoch {epoch+1}: Train Loss: {train_loss:.4f}, Train Acc: {epoch_train_acc:.2f}%')
         
         # ==========================
         # Phase B: Validation (验证)

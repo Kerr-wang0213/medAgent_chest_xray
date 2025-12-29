@@ -7,14 +7,14 @@ import torch
 from src.sabotage import generate_sabotaged_dataset
 from src.cleaning import clean_dataset
 from src.dataset import ChestXrayDataset
-from src.config import IMG_WIDTH, IMG_HEIGHT, BATCH_SIZE, NORM_MEAN, NORM_STD 
+from src.config import IMG_WIDTH, IMG_HEIGHT, BATCH_SIZE, NORM_MEAN, NORM_STD, RESULTS_DIR
 from src.visualization import plot_sample_images, plot_distribution
 from src.model import ChestXRayResNet18
 from src.train import train_model
 
 def main():
     #  Setup: 准备输出目录
-    VIS_DIR = Path("visualizations_output")
+    VIS_DIR = Path(RESULTS_DIR)
     VIS_DIR.mkdir(parents=True, exist_ok=True)
 
     # Phase 1: Sabotage (数据破坏)
@@ -111,7 +111,6 @@ def main():
     model = ChestXRayResNet18(num_classes=2)
 
     # 5. 开始训练
-    # 此时调用 train.py 里的函数，它会自动使用 CPU/GPU 并调用 visualization
     trained_model = train_model(model, train_loader, val_loader)
 
     print("\n>> Training Complete. Back to Main.")
