@@ -88,8 +88,8 @@ def plot_training_history(history, save_filename):
     
     # 2. Accuracy
     plt.subplot(1, 2, 2)
-    plt.plot(epochs, history['train_acc'], 'b-', label='Train Acc')
-    plt.plot(epochs, history['val_acc'], 'green--', label='Val Acc')
+    plt.plot(epochs, history['train_acc'], color='darkblue', linestyle='-', label='Train Acc')
+    plt.plot(epochs, history['val_acc'], color='mediumaquamarine', linestyle='--', label='Val Acc')
     plt.title('Accuracy Curve')
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy (%)')

@@ -13,9 +13,7 @@ def generate_sabotaged_dataset():
     2. NaN Labels
     3. Broken File Paths
     4. Corrupted Images (White/Black)
-    """
-    print("[SABOTAGED] Indexing raw data...")
-    
+    """  
     processed_dir = Path(PROCESSED_DATA_DIR)
     if processed_dir.exists():
         shutil.rmtree(processed_dir)   # Delete folder and its contents

@@ -25,7 +25,7 @@ IMG_HEIGHT = 224
 
 INPUT_SHAPE = (IMG_WIDTH, IMG_HEIGHT, 3)
 BATCH_SIZE = 32
-EPOCHS = 5
+EPOCHS = 4
 LEARNING_RATE = 1e-4
 
 NORM_MEAN = [0.485, 0.456, 0.406]     # Normalization Constants (ImageNet Standards)
